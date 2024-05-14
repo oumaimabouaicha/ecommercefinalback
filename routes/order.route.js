@@ -35,8 +35,7 @@ router.get('/', async (req, res, )=> {
     router.put('/:id', async (req, res) => {
     const newStatus = req.body.status;
     const orderId=req.params.id;
-    if (!['Not processed', 'Processing', 'Shipped', 'Delivered',
-    'Cancelled'].includes(newStatus)) {
+    if (!['Not processed', 'Processing', 'Shipped', 'Delivered'].includes(newStatus)) {
     res.status(403).json({ message: 'Invalid status value' }); return;
     }
     try {
@@ -48,7 +47,9 @@ router.get('/', async (req, res, )=> {
     if (!orderUpdated) {
     return res.status(404).json({ message: 'Order not found' });
     }
-    res.status(200).json(orderUpdated);
+    const order = await Order.findById(orderId).populate("allProduct.article").exec();
+              
+    res.status(200).json(order);
     } catch (error) {
     res.status(404).json({ message: error.message });
     }
